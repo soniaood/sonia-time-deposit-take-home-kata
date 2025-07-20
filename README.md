@@ -16,20 +16,20 @@ The API provides the following endpoints:
 
 * **`GET /time-deposits`**:
     * **Description:** Retrieves a list of all time deposits, including their associated withdrawals.
-      * **Response:**
+      * **Response:** `200 OK`
           ```json
           {
             "data": [
                 {
-                  "id": Integer,
-                  "planType": String, // e.g., "BASIC", "STUDENT", "PREMIUM"
-                  "balance": Decimal,
-                  "days": Integer,
+                  "id": 1,
+                  "planType": "BASIC",
+                  "balance": 1000.00,
+                  "days": 34,
                   "withdrawals": [
                     {
-                      "id": Integer,
-                      "amount": Decimal,
-                      "date": Date // YYYY-MM-DD
+                      "id": 1,
+                      "amount": 200.00,
+                      "date": "2025-01-01"
                     }
                   ]
                 }
@@ -79,7 +79,7 @@ To run this application locally, you'll need **Docker** and a **Java Development
     ```
 
 4.  **Run the Spring Boot Application:**
-    Once the database is up, start the Spring Boot application. This step will automatically apply Flyway migrations (to create the schema) and, `data.sql` gets executed to populate initial test data. Please refer to `spring.sql.init.mode` configuration in `application.properties` to control the test data creation.
+    Once the database is up, start the Spring Boot application. This step will automatically apply Flyway migrations (to create the schema) and Spring SQL `data.sql` gets executed to populate initial test data. Please refer to `spring.sql.init.mode` configuration in `application.properties` to control the test data creation.
 
     ```bash
      mvn spring-boot:run
@@ -94,25 +94,25 @@ To run this application locally, you'll need **Docker** and a **Java Development
         ```bash
         curl http://localhost:8080/time-deposits
         ```
-    * **Update All Time Deposit Balances (Trigger Interest Calculation):**
+    * **Update All Time Deposit Balances:**
         ```bash
         curl -X POST http://localhost:8080/time-deposits/update-balances
         ```
 
-### 5. Implementation Details
+### Implementation Details
 
 * **Refactored Interest Calculation:** The original `TimeDepositCalculator.updateBalance` method signature was preserved. The behavior of this method remains unchanged. Its internal logic was refactored to use a **Strategy Pattern** with `TimeDepositInterestCalculator` interface and separate implementations (`BasicTimeDepositInterestCalculator`, `StudentTimeDepositInterestCalculator`, `PremiumTimeDepositInterestCalculator`).
   * Interest calculation follows the specified plan interest rate and day-based conditions.
   * The interest rate is defined within `TimeDepositPlan` enum (acting as the single source of truth for the plan's interest rates). In the other hand, each calculator implementation is responsible for its specific calculation rules.
-  * Precision for balance amounts is maintained using `BigDecimal` throughout calculations defining scale. Intermediate interest calculations use a scale of 6 to avoid precision loss, while final balances are rounded to 2 decimal places.* **Type-Safe Entity Design:** The `planType` field in `TimeDeposit` is using `TimeDepositPlan` enum, ensuring type safety. A custom `AttributeConverter` handles the mapping between the enum and the database's string column, providing robustness and flexibility.
+  * Precision for balance amounts is maintained using `BigDecimal` throughout calculations defining scale. Intermediate interest calculations use a scale of 6 to avoid precision loss, while final balances are rounded to 2 decimal places.
+* **Type-Safe Entity Design:** The `planType` field in `TimeDeposit` is using `TimeDepositPlan` enum, ensuring type safety. A custom `AttributeConverter` handles the mapping between the enum and the database's string column, providing robustness and flexibility.
 * **API Response Structure:** The `GET /time-deposits` endpoint returns data wrapped in a **`ListResponse`**. This design facilitates future extensions, such as implementing pagination or adding other response metadata, without breaking existing client contracts.
 * **Code Integration:** A dedicated `TimeDepositMapper` handles conversions between the JPA entities, API DTOs, and the existing internal `TimeDeposit` class, ensuring no breaking changes were introduced.
 * **No Exception Handling:** As per requirements, invalid input/exception handling is omitted for simplicity of the assignment.
 * **Logic simplification:** As per requirements, `updateAllTimeDepositBalances` method focuses solely on applying interest, without handling withdrawals or other business logic. `POST /time-deposits/update-balances` endpoint will apply interest every time it's called, which is acceptable for this exercise.
 
 
-
-### 6. Future Improvements & Considerations
+### Future Improvements & Considerations
 
 * **Asynchronous Balance Updates & Performance Improvements:** The `updateAllTimeDepositBalances` method could be significantly optimized by making the balance updates asynchronous, allowing the API to return immediately while the updates are processed in the background. This improvement, potentially utilizing multi-threading (e.g., ExecutorService) or batch processing frameworks, would enhance performance for large numbers of time deposits and aligns with the current API `202 Accepted` response indicating background processing.
 * **More Robust Error Handling:** Implementing comprehensive error handling, validation, and logging for improved readiness.
