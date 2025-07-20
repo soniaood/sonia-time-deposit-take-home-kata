@@ -44,15 +44,10 @@ public class TimeDepositMapper {
                                                  timeDepositEntity.getDays());
     }
 
-    public TimeDeposit toTimeDepositEntity(org.ikigaidigital.TimeDeposit internalTimeDeposit) {
-        TimeDeposit timeDepositEntity = new TimeDeposit();
-        timeDepositEntity.setId(internalTimeDeposit.getId());
-        timeDepositEntity.setPlanType(TimeDepositPlan.fromRawPlanType(internalTimeDeposit.getPlanType()));
+    public void updateTimeDepositEntityFromInternal(TimeDeposit timeDepositEntity,
+                                                    org.ikigaidigital.TimeDeposit internalTimeDeposit) {
         timeDepositEntity.setBalance(BigDecimal.valueOf(internalTimeDeposit.getBalance())
-                                               .setScale(TimeDepositConstants.FINANCIAL_SCALE,
-                                                         TimeDepositConstants.FINANCIAL_ROUNDING_MODE));
-        timeDepositEntity.setDays(internalTimeDeposit.getDays());
-
-        return timeDepositEntity;
+                                                  .setScale(TimeDepositConstants.FINANCIAL_SCALE,
+                                                           TimeDepositConstants.FINANCIAL_ROUNDING_MODE));
     }
 }

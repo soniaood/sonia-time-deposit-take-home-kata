@@ -46,16 +46,16 @@ public class TimeDepositService {
                                                           .collect(Collectors.toList());
         timeDepositCalculator.updateBalance(deposits);
 
-        for (TimeDeposit timeDeposit : timeDeposits) {
-            org.ikigaidigital.TimeDeposit updatedInternalDeposit = deposits.get(timeDeposits.indexOf(timeDeposit));
-            BigDecimal updatedBalance = BigDecimal.valueOf(updatedInternalDeposit.getBalance())
-                    .setScale(TimeDepositConstants.FINANCIAL_SCALE, TimeDepositConstants.FINANCIAL_ROUNDING_MODE);
-            if (updatedBalance.compareTo(timeDeposit.getBalance()) != 0) {
+        for (int i = 0; i < timeDeposits.size(); i++) {
+            TimeDeposit timeDeposit = timeDeposits.get(i);
+            org.ikigaidigital.TimeDeposit updatedInternalDeposit = deposits.get(i);
+            if (updatedInternalDeposit.getBalance() != timeDeposit.getBalance().doubleValue()) {
+                BigDecimal previousBalance = timeDeposit.getBalance();
+                mapper.updateTimeDepositEntityFromInternal(timeDeposit, updatedInternalDeposit);
                 LOGGER.info("Updating deposit id {} balance from: {} to: {}.",
-                            timeDeposit.getId(), timeDeposit.getBalance(), updatedBalance);
-                timeDeposit.setBalance(updatedBalance);
-                timeDepositRepository.save(timeDeposit);
+                            timeDeposit.getId(), previousBalance, timeDeposit.getBalance());
             }
         }
+        timeDepositRepository.saveAll(timeDeposits);
     }
 }

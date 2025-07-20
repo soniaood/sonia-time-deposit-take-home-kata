@@ -2,6 +2,7 @@ package org.ikigaidigital.service;
 
 import org.ikigaidigital.TimeDepositCalculator;
 import org.ikigaidigital.dto.TimeDepositResponse;
+import org.ikigaidigital.entity.TimeDeposit;
 import org.ikigaidigital.entity.TimeDepositPlan;
 import org.ikigaidigital.mapper.TimeDepositMapper;
 import org.ikigaidigital.repository.TimeDepositRepository;
@@ -108,28 +109,15 @@ class TimeDepositServiceTest {
         var timeDeposits = List.of(timeDeposit);
         var internalTimeDeposit = new org.ikigaidigital.TimeDeposit(timeDeposit.getId(), timeDeposit.getPlanType().getRawPlanType(), balance.doubleValue(), timeDeposit.getDays());
 
-        var updatedTimeDeposit = TestUtils.aTimeDepositBuilder()
-                .withId(timeDeposit.getId())
-                .withPlanType(timeDeposit.getPlanType())
-                .withBalance(new BigDecimal("1000.83").setScale(2, RoundingMode.HALF_UP))
-                .withDays(timeDeposit.getDays())
-                .withWithdrawals(Collections.emptyList())
-                .build();
-
         when(timeDepositRepositoryMock.findAll()).thenReturn(timeDeposits);
         when(timeDepositMapperMock.toTimeDepositInternal(timeDeposit)).thenReturn(internalTimeDeposit);
-        doAnswer(invocation -> {
-            internalTimeDeposit.setBalance(1000.83); // Simulate the balance update
-            return internalTimeDeposit;
-        }).when(timeDepositCalculatorMock).updateBalance(List.of(internalTimeDeposit));
-        when(timeDepositMapperMock.toTimeDepositEntity(internalTimeDeposit)).thenReturn(updatedTimeDeposit);
 
         target.updateAllTimeDepositBalances();
 
         verify(timeDepositRepositoryMock, times(1)).findAll();
         verify(timeDepositMapperMock, times(1)).toTimeDepositInternal(timeDeposit);
         verify(timeDepositCalculatorMock, times(1)).updateBalance(List.of(internalTimeDeposit));
-        verify(timeDepositRepositoryMock, times(1)).save(updatedTimeDeposit);
+        verify(timeDepositRepositoryMock, times(1)).saveAll(timeDeposits);
         verifyNoMoreInteractions(timeDepositRepositoryMock);
     }
 }

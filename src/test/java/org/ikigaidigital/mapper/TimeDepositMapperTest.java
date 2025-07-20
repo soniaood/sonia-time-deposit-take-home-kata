@@ -65,4 +65,25 @@ class TimeDepositMapperTest {
         assertEquals("student", internalTimeDeposit.getPlanType(), "Plan type should match.");
         assertEquals(10000.00, internalTimeDeposit.getBalance(), "Balance should match.");
     }
+
+    @Test
+    @DisplayName("Should update TimeDeposit entity from internal representation correctly")
+    void updateTimeDepositEntityFromInternal() {
+        TimeDeposit timeDepositEntity = aTimeDepositBuilder().withId(3)
+                                                             .withPlanType(TimeDepositPlan.PREMIUM)
+                                                             .withBalance(new BigDecimal("5000.00"))
+                                                             .withDays(60)
+                                                             .build();
+
+        var internalTimeDeposit = aTimeDepositInternalBuilder().withId(3)
+                                                               .withPlanType("premium")
+                                                               .withBalance(5200.00)
+                                                               .withDays(60)
+                                                               .build();
+
+        target.updateTimeDepositEntityFromInternal(timeDepositEntity, internalTimeDeposit);
+
+        assertNotNull(timeDepositEntity, "Time deposit entity should not be null.");
+        assertEquals(new BigDecimal("5200.00").setScale(2, RoundingMode.HALF_UP), timeDepositEntity.getBalance(), "Balance should be updated.");
+    }
 }
