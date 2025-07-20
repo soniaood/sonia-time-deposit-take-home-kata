@@ -2,7 +2,6 @@ package org.ikigaidigital.service;
 
 import org.ikigaidigital.TimeDepositCalculator;
 import org.ikigaidigital.dto.TimeDepositResponse;
-import org.ikigaidigital.entity.TimeDeposit;
 import org.ikigaidigital.entity.TimeDepositPlan;
 import org.ikigaidigital.mapper.TimeDepositMapper;
 import org.ikigaidigital.repository.TimeDepositRepository;
@@ -19,7 +18,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

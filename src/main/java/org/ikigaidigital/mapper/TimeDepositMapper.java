@@ -3,7 +3,6 @@ package org.ikigaidigital.mapper;
 import org.ikigaidigital.dto.TimeDepositResponse;
 import org.ikigaidigital.dto.WithdrawalResponse;
 import org.ikigaidigital.entity.TimeDeposit;
-import org.ikigaidigital.entity.TimeDepositPlan;
 import org.ikigaidigital.util.TimeDepositConstants;
 import org.springframework.stereotype.Component;
 

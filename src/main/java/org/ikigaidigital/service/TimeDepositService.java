@@ -5,7 +5,6 @@ import org.ikigaidigital.dto.TimeDepositResponse;
 import org.ikigaidigital.entity.TimeDeposit;
 import org.ikigaidigital.mapper.TimeDepositMapper;
 import org.ikigaidigital.repository.TimeDepositRepository;
-import org.ikigaidigital.util.TimeDepositConstants;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
